@@ -1,4 +1,68 @@
 {
+  "harmonize": {
+    "artifacts": {
+      "opencode.json": {
+        "created": true,
+        "hash": "df969aec35d21abbc4e33fa9ba9bc95fb9a82c0d15f9268b94071ef35711c0fd",
+        "kind": "permission",
+        "mine": [
+          "shell|vp check|allow",
+          "shell|vp check --fix|allow",
+          "shell|vp lint *|allow",
+          "shell|vp test|allow",
+          "shell|vp test *|allow",
+          "shell|vp run ready|allow",
+          "shell|vp run -r test|allow",
+          "shell|vp run -r build|allow",
+          "shell|vp -C * test|allow",
+          "shell|vp -C * test *|allow",
+          "shell|vp -C * build|allow",
+          "shell|vp install|allow",
+          "shell|vpx tools/guard/src/bin/check-text.ts|allow",
+          "shell|git status|allow",
+          "shell|git status *|allow",
+          "shell|git diff|allow",
+          "shell|git diff *|allow",
+          "shell|git log *|allow",
+          "shell|git show *|allow",
+          "shell|git grep *|allow",
+          "read|**/.env|deny",
+          "read|**/.env.*|deny",
+          "read|**/.envrc|deny",
+          "edit|**/.env|deny",
+          "edit|**/.env.*|deny",
+          "read|~/.ssh/**|deny",
+          "read|~/.aws/**|deny",
+          "read|~/.config/gh/**|deny",
+          "read|~/.git-credentials|deny",
+          "shell|printenv*|deny",
+          "shell|env|deny",
+          "shell|* --no-verify*|deny",
+          "shell|git push --force*|deny",
+          "shell|git push -f*|deny",
+          "shell|vp hooks disable*|deny"
+        ],
+        "sources": {
+          ".claude/settings.json": "bcb5167bfa3938796ff5c636136a1afc71ba52df98c86e4b0b5ccfdaeadcdb57"
+        }
+      }
+    },
+    "from": "claude",
+    "ops": [
+      {
+        "op": "write",
+        "path": "AGENTS.md",
+        "slot": 1
+      },
+      {
+        "op": "unlink",
+        "path": "CLAUDE.md",
+        "slot": 2
+      }
+    ],
+    "rules": "pure",
+    "version": 1
+  },
   "skills": {
     "vp": {
       "answers": {

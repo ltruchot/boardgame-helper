@@ -40,5 +40,5 @@ vp run ready        # everything above plus the builds
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/). The `pre-commit` and
 `commit-msg` hooks (installed by `vp install`) reject secrets, personal data and messages that
-narrate instead of describing the change. Rules: [`CLAUDE.md`](CLAUDE.md),
+narrate instead of describing the change. Rules: [`AGENTS.md`](AGENTS.md),
 [`.claude/skills/public-writing`](.claude/skills/public-writing/SKILL.md).

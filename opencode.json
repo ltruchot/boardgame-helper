@@ -1,0 +1,179 @@
+{
+  "permissions": [
+    {
+      "action": "shell",
+      "resource": "vp check",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp check --fix",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp lint *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp test",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp test *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp run ready",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp run -r test",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp run -r build",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp -C * test",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp -C * test *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp -C * build",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vp install",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "vpx tools/guard/src/bin/check-text.ts",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git log *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git show *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git grep *",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "**/.env",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "**/.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "**/.envrc",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "**/.env",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "**/.env.*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "~/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "~/.aws/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "~/.config/gh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "~/.git-credentials",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "printenv*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "env",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "* --no-verify*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push --force*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git push -f*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "vp hooks disable*",
+      "effect": "deny"
+    }
+  ]
+}

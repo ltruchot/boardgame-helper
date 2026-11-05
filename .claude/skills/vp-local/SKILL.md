@@ -18,8 +18,8 @@ Vite+ 1.5.0 (pinned in the `pnpm-workspace.yaml` catalog), on TypeScript 7 (nati
 Node and pnpm, both pinned in the root `package.json` `devEngines` (`runtime` Node 26.13.0,
 written by `vp env pin`; `packageManager` pnpm 12.16.1) and downloaded on demand, no global
 install. `engines.node` (`^22.22.1 || ^24.11.0 || >=26.0.0`) states the range the toolchain
-supports: `vpx` needs `^22.18.0 || ^24.11.0 || >=26.0.0`, `vp staged` 22.22.1+ or 24.11.0+. Official agent text: `AGENTS.md` (rewritten by `vp config`; project rules
-live in `CLAUDE.md`).
+supports: `vpx` needs `^22.18.0 || ^24.11.0 || >=26.0.0`, `vp staged` 22.22.1+ or 24.11.0+. Rules live in `AGENTS.md`; `vp config` rewrites only its block between
+`<!--VITE PLUS START-->` and `<!--VITE PLUS END-->`.
 
 ## Workspace
 
