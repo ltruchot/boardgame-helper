@@ -15,18 +15,20 @@ The `vp` skill holds what is true of Vite+ anywhere; it is installed by `qol-min
 edited here (`.claude/qol-mini.lock.json`). This file holds what is true of this repo only.
 
 Vite+ 1.5.0 (pinned in the `pnpm-workspace.yaml` catalog), on TypeScript 7 (native). Vite+ owns
-Node (resolved from `engines.node`) and pnpm (`devEngines`, 12.16.1): both downloaded on demand,
-no global install. Official agent text: `AGENTS.md` (rewritten by `vp config`; project rules
+Node and pnpm, both pinned in the root `package.json` `devEngines` (`runtime` Node 26.13.0,
+written by `vp env pin`; `packageManager` pnpm 12.16.1) and downloaded on demand, no global
+install. `engines.node` (`^22.22.1 || ^24.11.0 || >=26.0.0`) states the range the toolchain
+supports: `vpx` needs `^22.18.0 || ^24.11.0 || >=26.0.0`, `vp staged` 22.22.1+ or 24.11.0+. Official agent text: `AGENTS.md` (rewritten by `vp config`; project rules
 live in `CLAUDE.md`).
 
 ## Workspace
 
-| Path             | What                                            | Key commands                                            |
-| ---------------- | ----------------------------------------------- | ------------------------------------------------------- |
-| `apps/website`   | Vite app                                        | `vp -C apps/website dev` / `build` / `preview`          |
-| `apps/api`       | Node HTTP server (no Vite), `@anthropic-ai/sdk` | `vp run api` (root, watch) / `vp -C apps/api run start` |
-| `packages/utils` | library built with `vp pack` (tsdown)           | `vp -C packages/utils test` / `build`                   |
-| `tools/guard`    | secret/privacy/writing checks used by hooks     | `vp -C tools/guard test`                                |
+| Path             | What                                                                        | Key commands                                                              |
+| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `apps/website`   | Vite app                                                                    | `vp -C apps/website dev` / `build` / `preview`                            |
+| `apps/api`       | Node script (no Vite) running Claude API exercises with `@anthropic-ai/sdk` | `vp run api` (root, reruns on change) / `vp -C apps/api run start` (once) |
+| `packages/utils` | library built with `vp pack` (tsdown)                                       | `vp -C packages/utils test` / `build`                                     |
+| `tools/guard`    | secret/privacy/writing checks used by hooks                                 | `vp -C tools/guard test`                                                  |
 
 - The root `vite.config.ts` owns `fmt`, `lint` and `staged` for the whole workspace; a
   package's `vite.config.ts` owns only its Vite/pack/test config.
@@ -39,11 +41,17 @@ live in `CLAUDE.md`).
 Vite"). What is specific to it:
 
 - Root entry: `"api": "vp run api#dev"` in the root `package.json`, so `vp run api` starts it.
+- `src/main.ts` runs once and exits: it picks `claude-haiku-4-5-20251001` from the model list,
+  then runs each exercise (`src/ex<NN>-<name>/index.ts`, a function taking the client and the
+  model) and prints the text blocks with `printResponse` (`src/utils.ts`). In `dev`,
+  `vpx --watch` reruns it on every saved change: each rerun calls the API.
+- `new Anthropic()` reads `ANTHROPIC_API_KEY` from the environment, loaded from the git-ignored
+  `apps/api/.env` by `--env-file-if-exists`.
 - `tsconfig.json`: `lib: ["es2023"]`, `types: ["node"]`.
-- Lint: log with `process.stdout.write` (`no-console` applies outside `tools/**/src/bin`); pass
-  request handlers inline to `createServer` so their mutable `IncomingMessage`/`ServerResponse`
-  parameters are inferred (`prefer-readonly-parameter-types` ignores inferred types).
-- Port: `PORT` env, default 3000. Stop a running server by PID.
+- Lint: print with `process.stdout.write` (`no-console` applies outside `tools/**/src/bin`);
+  failures `throw new Error(…)` at the top level, which exits with code 1. The SDK's `Anthropic`,
+  `ModelInfo` and `Message` are mutable: they are in the `prefer-readonly-parameter-types` allow
+  list (root `vite.config.ts`).
 
 ## Strictness
 
