@@ -1,7 +1,7 @@
 ---
 name: vp
-description: Vite+ (vp) in this TypeScript monorepo (apps/*, packages/*, tools/*). Always `vp <command>` instead of pnpm/npm/node/vite/vitest/oxlint/tsc directly; strict lint and tsconfig, git hooks, the TypeScript LSP. Load before touching package.json, vite.config.ts, tsconfig*.json, pnpm-workspace.yaml, .vite-hooks/, or running install/build/dev/test.
-globs:
+description: Vite+ (vp) in a pnpm workspace. Run `vp <command>` instead of pnpm, npm, node, vite, vitest, oxlint, oxfmt or tsx directly. Use before touching package.json, vite.config.ts, tsconfig*.json, pnpm-workspace.yaml or .vite-hooks/, and before running install, dev, build, test, lint, a task or a script.
+paths:
   - "**/package.json"
   - "**/vite.config.ts"
   - "**/tsconfig*.json"
@@ -9,130 +9,145 @@ globs:
   - ".vite-hooks/*"
 ---
 
-# Vite+ here
+# Vite+ (`vp`)
 
-Local docs: `node_modules/vite-plus/docs/guide/` (lint: `guide/lint.md`, hooks:
-`guide/commit-hooks.md`). Online: <https://viteplus.dev/guide/>. Official agent text: `AGENTS.md`
-(rewritten by `vp config`; project rules live in `CLAUDE.md`).
+Written against Vite+ 1.5: Vite 8, Rolldown, Vitest 5, Oxlint, Oxfmt, tsgolint, tsdown,
+Vite Task. `vp --version` and `vp toolchain` print what this project runs.
 
-Vite+ 1.5.0 (pinned in the `pnpm-workspace.yaml` catalog) = Vite + Rolldown + Vitest 5 + Oxlint +
-Oxfmt + tsgolint + tsdown, on TypeScript 7 (native). Vite+ owns Node (resolved from
-`engines.node`) and pnpm (`devEngines`, 12.16.1): both downloaded on demand, no global install.
+Docs: <https://viteplus.dev/guide/>, for example `/guide/vpx`, `/guide/lint`,
+`/guide/commit-hooks`. Read the page before guessing a flag. The copy in
+`node_modules/vite-plus/docs/guide/` and `docs/config/` matches the installed version: use it
+offline, and the online page when the two differ.
 
-## Workspace
+## Rule 1: `vp <command>`, never the tool underneath
 
-| Path             | What                                         | Key commands                                   |
-| ---------------- | -------------------------------------------- | ---------------------------------------------- |
-| `apps/website`   | Vite app                                     | `vp -C apps/website dev` / `build` / `preview` |
-| `apps/api`       | Vite app using `@anthropic-ai/sdk` + `utils` | `vp -C apps/api dev` / `build`                 |
-| `packages/utils` | library built with `vp pack` (tsdown)        | `vp -C packages/utils test` / `build`          |
-| `tools/guard`    | secret/privacy/writing checks used by hooks  | `vp -C tools/guard test`                       |
+| Task | Command | Notes |
+|---|---|---|
+| Install | `vp install` | CI: `vp install --frozen-lockfile`, which fails if the lockfile would change |
+| Add, remove a dependency | `vp -C apps/website add <pkg>` (`-D` dev, `-E` exact), `vp remove <pkg>` | then move the version to the catalog, see below |
+| Dev server | `vp -C apps/website dev` | <http://localhost:5173> |
+| Production build | `vp -C apps/website build` | apps; libraries build with `vp pack` |
+| Serve the build | `vp -C apps/website preview` | after `vp build` |
+| Format, lint, types | `vp check`, `vp check --fix` | from the root, whole workspace; `vp check --fix <file>` for one file |
+| Tests | `vp -C apps/website test` | runs once; `vp test watch` watches; `vp test run --coverage` |
+| A script or a task | `vp run <name>`, short form `vpr <name>` | `package.json` script or `run.tasks` entry |
+| A TypeScript or JavaScript file | `vpx <file>`, `vpx --watch <file>` | on the project's Node, with the oxc-node loader; no `tsx`, no `ts-node` |
+| A one-off binary | `vp exec <bin>` (local), `vp dlx <pkg>` or `vpx <pkg>` (downloaded) | `vp dlx` adds no dependency |
+| Versions | `vp toolchain`, `vp why <pkg>`, `vp outdated`, `vp info <pkg> version` | `vp why` shows the package-manager graph only |
 
-Shared versions live in the `catalog:` of `pnpm-workspace.yaml`; a package lists
-`"<dep>": "catalog:"`, workspace deps `"workspace:*"`. The root `vite.config.ts` owns `fmt`,
-`lint` and `staged` for the whole workspace (Vite+ ignores nested lint/fmt blocks); a package's
-`vite.config.ts` owns only its Vite/pack/test config.
+- `vp build` is the builtin and cannot be overridden; `vp run build` is the script or task of
+  that name. Same for `dev`, `test`, `preview`, `lint`, `fmt`, `check`, `pack`.
+- `vp pm <subcommand>` forwards a fixed list to the package manager (`view`, `list`, `audit`,
+  `cache`, `config`, `publish`, `pack`, `ci`, `approve-builds`, `patch`, ...), not anything.
+  Extra arguments go after `--`. `vp pm --help` prints the list.
+- `vpx <file>` reads tsconfig `paths`, `.js` imports of `.ts` files and Node options such as
+  `--env-file-if-exists=.env`. A missing file is an error, never a download.
 
-## Rule #1: `vp <command>`, never the tool underneath
+## Targeting a package
 
-| Task                       | Command                                         | Notes                                                |
-| -------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
-| Install deps               | `vp install` (root)                             | after every pull; CI: `vp install --frozen-lockfile` |
-| Add a dep                  | `vp -C <package> add <pkg>` (`-D` dev)          | then move the version to the catalog                 |
-| Format + lint + type check | `vp check` / `vp check --fix` (root)            | whole workspace, type-aware lint on TS 7             |
-| Tests                      | `vp -C <package> test`, all: `vp run -r test`   | Vitest; import from `vite-plus/test`                 |
-| Build                      | `vp -C <package> build`, all: `vp run -r build` | `vp build` at the root needs a target package        |
-| Everything ("done")        | `vp run ready`                                  | check → tests → builds                               |
-| Run a TS/JS file           | `vpx <file>` (hooks, scripts, CI)               | no `tsx` / `ts-node`                                 |
-| Outdated deps              | `vp outdated`                                   |                                                      |
+- `vp -C <dir> <command>` runs any command as if started in `<dir>`. Use it for builtins.
+- A positional directory (`vp dev apps/website`) only sets Vite's `root` and exists on `dev`,
+  `build` and `preview` only. Prefer `-C`.
+- `vp test <arg>` filters test files, and `vp pack <arg>` names entry files: neither targets a
+  package.
+- At the workspace root, a bare `vp dev`, `vp build`, `vp preview` or `vp pack` asks which
+  package, and in a non-interactive shell exits 1 with `needs a target package`.
+  `defaultPackage` in the root `vite.config.ts` fixes the target.
+- `-F`, `--filter` selects packages on `vp run`, `vp exec` and the package-manager commands
+  only. On `vp dev` and `vp build`, `-f` filters debug logs.
 
-`vp build` = the builtin; `vp run <name>` = a package.json script or task. Scripts cannot shadow
-builtins.
+## `vp run`
 
-## Strictness
+- `-r` every package, `-t` this package and its dependencies, `-F <pattern>` pnpm filter
+  syntax, `-w` the workspace root, `<package>#<task>` one task of one package.
+- `--parallel` drops dependency ordering. `--cache` and `--no-cache` override the cache.
+- A task name lives in `vite.config.ts` (`run.tasks`) or in `package.json`, never in both.
+- Tasks are cached by default, scripts are not. Set `cache: false` on a dev server and on
+  anything that must always run.
+- A task runs in a clean environment: only a short list (`PATH`, `HOME`, `CI`, ...) passes.
+  Another variable goes in `cache.env` (part of the cache key) or `cache.untrackedEnv`.
+- A command string is read by a shell. `&&` chains are split into sub-tasks cached one by
+  one. An array `command` is a sequence of commands, not an argument vector.
 
-- `tsconfig.base.json`: `strict` plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
-  `noPropertyAccessFromIndexSignature`, `noImplicitReturns`, `noImplicitOverride`,
-  `noUncheckedSideEffectImports`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, unused code and
-  unreachable code as errors. Each package `tsconfig.json` extends it and adds only `lib`/`types`.
-- Oxlint (root `vite.config.ts`): categories correctness, suspicious, pedantic and perf as errors,
-  plus selected restriction/style rules (no `any`, no `!`, no unsafe assertion, explicit return
-  types, readonly parameters, strict boolean expressions, exhaustive switch, complexity and size
-  limits, kebab-case file names, no default export except `vite.config.ts`). Warnings fail the run
-  (`denyWarnings`); unused disable directives are errors.
-- A rule is relaxed only for a whole category of legitimate code, in `lint.overrides` or the rule
-  options, with a comment that says why. Never per line.
+## Configuration: one `vite.config.ts`
+
+- `import { defineConfig } from "vite-plus"` in config files. Other files keep
+  `from "vite"`. Tests import from `vite-plus/test`.
+- Blocks: `run` (with `run.tasks`), `fmt`, `lint`, `check`, `test`, `pack`, `staged`, `create`,
+  plus `defaultPackage`, beside Vite's own `server`, `build`, `preview`, `plugins`.
+- No `vitest.config.ts`, `tsdown.config.ts`, `.oxlintrc.json` or `.oxfmtrc.json`.
+- Keep `lint` and `fmt` in the root config. `vp check` reads the root blocks only. A rule for
+  one package goes in `lint.overrides` or `fmt.overrides`, with globs relative to the root.
+- Type checks run in `vp check` only when `lint.options.typeAware` and
+  `lint.options.typeCheck` are on. Without them `vp check` passes on a type error.
+- Vitest collects `*.test.*` and `*.spec.*`. When Playwright specs share the repo, set
+  `test.include` or name them `*.e2e.ts`.
+
+## A Node app without Vite
+
+A back end has no `index.html` and no `vite.config.ts`, and no `vite` dependency; it keeps
+`vite-plus` for `vpx`, `vp test` and `vp check`. `vp create` scaffolds a web app even for a
+back end: remove `index.html`, `public/` and the DOM code.
+
+- `"dev": "vpx --env-file-if-exists=.env --watch src/main.ts"`, `"start"` the same without
+  `--watch`. `--env-file-if-exists` is a Node option: no dotenv dependency.
+- No `build` script: `vp check` type-checks it, and `vp run -r build` skips the package.
+- `tsconfig.json`: `"types": ["node"]`, `@types/node` from the catalog.
+
+## Dependencies in a pnpm workspace
+
+- Shared versions live in `catalog:` in `pnpm-workspace.yaml`; a package lists
+  `"<dep>": "catalog:"`, a workspace dependency `"workspace:*"`.
+- `minimumReleaseAge` is in minutes and defaults to 1440 since pnpm 11. A release younger
+  than that fails to install: take the previous version, or list it in
+  `minimumReleaseAgeExclude` by exact version (`"@voidzero-dev/vite-plus-core@1.5.0"`, one
+  line per platform package) when the reason is known. A bare name exempts every future
+  release.
+- Exact versions: `vp add -E`, or `savePrefix: ""`.
+
+## Upgrading Vite+
+
+- Global CLI: `vp upgrade`, `vp upgrade --check`. Project: `vp migrate` with a global CLI
+  newer than the project re-pins `vite-plus`, the `vite` alias to
+  `@voidzero-dev/vite-plus-core` and the `vitest@*` override, across the workspace. It skips
+  the first-time setup; `--full` runs it.
+- By hand: the three together, wherever they are declared (catalog, `overrides`), then the
+  `vitest@*` override to the version `vp toolchain vitest` prints, then `vp install`.
+- An out-of-date `vitest` pin installs the previous runner beside the bundled one and splits
+  mocks and `expect` between two copies.
+- Reference: `node_modules/vite-plus/docs/guide/upgrade-project.md`.
+
+## Node and the package manager
+
+- Node resolves from the nearest of, in order: `.node-version`, `devEngines.runtime`,
+  `engines.node`, `.nvmrc`. `vp env pin <version>` writes the pin, `vp env current` shows
+  what resolved and from where, `vp env doctor` diagnoses.
+- The package manager comes from `packageManager`, then `devEngines.packageManager`. With
+  both, `packageManager` drives and a mismatch warns.
+- In system-first mode for the package manager (`vp env off pnpm`), Vite+ runs the `pnpm` on
+  `PATH`, which may not be the pinned one. `vp env on pnpm` restores managed mode;
+  `vp env doctor pnpm` shows the mode.
+- `vp env`, `vp node <file>`, `vp upgrade` need the global CLI. `node: command not found`
+  means no global Node: `vpx <file>` or `vp node <file>`.
 
 ## Git hooks
 
-Vite+ owns the hook plumbing; the project only adds commands
-(`node_modules/vite-plus/docs/guide/commit-hooks.md`).
+- `"prepare": "vp config"` installs the dispatcher in `.vite-hooks/_` (ignored by git) and sets
+  `core.hooksPath`. It writes no hook: `.vite-hooks/pre-commit` is a committed file that runs
+  `vp staged`, which reads the `staged` block of the root `vite.config.ts`.
+- `staged`: for each glob, the commands run in order with the staged paths appended, and stop
+  at the first failure. A check that must see a file before `vp check --fix` rewrites it comes
+  first.
+- Another hook is a committed `.vite-hooks/<hook>` (`commit-msg`, ...), run with `sh`, no
+  shebang needed. Inside a hook `vp` is the project-local CLI, which has no `vp node`: run
+  TypeScript with `vpx <file>`.
+- `vp hooks status` shows the preference, `core.hooksPath` and the project hooks.
+- Never `git commit --no-verify`, `VP_GIT_HOOKS=0` or `vp hooks disable`: fix the content.
 
-| Piece         | Where                                 | Role                                                                                                                       |
-| ------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Dispatcher    | `.vite-hooks/_/` (git-ignored)        | installed by `"prepare": "vp config"` on every `vp install`; sets `core.hooksPath`, puts `node_modules/.bin` first on PATH |
-| `pre-commit`  | `.vite-hooks/pre-commit`              | the stock one-liner `vp staged`; never add commands here                                                                   |
-| Staged checks | `staged` in the root `vite.config.ts` | lint-staged 17 rules: `"*": ["vpx tools/guard/src/bin/scan-staged.ts", "vp check --fix"]`                                  |
-| `commit-msg`  | `.vite-hooks/commit-msg`              | `vpx tools/guard/src/bin/commit-msg.ts "$1"`: Vite+ has no config block for this hook, so the script is project-owned      |
+## More
 
-How the `staged` rules run: for each glob, the array runs in order and stops at the first failure,
-with the staged paths appended as arguments. The guard scan comes first so a secret is rejected
-before `vp check --fix` rewrites and re-stages files. The glob `*` matches dotfiles, so a
-force-added `.env` reaches the scan.
-
-Adding a check: append a command to the `staged` array (it must accept file paths), or for
-another git hook create `.vite-hooks/<hook>` (no shebang needed, the dispatcher runs it with
-`sh`). TypeScript in a hook runs with `vpx <file>`: inside a hook `vp` is the project-local CLI,
-which has no `vp node`.
-
-Check the wiring: `vp hooks status` lists `Project hooks: commit-msg, pre-commit` and
-`core.hooksPath: .vite-hooks/_`. Run a check by hand: `vpx tools/guard/src/bin/scan-staged.ts`
-(every staged file) or `vpx tools/guard/src/bin/commit-msg.ts <message file>`.
-
-Never `git commit --no-verify`, `VP_GIT_HOOKS=0` or `vp hooks disable`: the Claude Code hook
-blocks them, and a failing check is fixed in the content.
-
-## TypeScript LSP (Claude Code plugin `typescript-lsp`)
-
-`.claude/settings.json` enables `typescript-lsp@claude-plugins-official`, which runs
-`typescript-language-server` from PATH. TypeScript 7 ships no `tsserver`: the server reports the
-workspace TS 7 as unusable and falls back to the TypeScript installed next to itself ("bundled").
-One-time setup per machine:
-
-```bash
-vp install -g typescript-language-server
-npm install -g --prefix "$(ls -d ~/.vite-plus/packages/typescript-language-server/*/ | head -1)" typescript@6
-rm -f ~/.vite-plus/bin/tsc ~/.vite-plus/bin/tsserver ~/.vite-plus/bins/tsc.json ~/.vite-plus/bins/tsserver.json
-```
-
-The last line removes the global `tsc`/`tsserver` shims npm adds, so `tsc` stays the project's
-TS 7. Redo the second and third lines after `vp update -g typescript-language-server`. Restart
-Claude Code to start the server. Editor diagnostics come from TS 6; `vp check` and the builds
-(TS 7) are the authority. TS 6 is never added to the workspace: a root `typescript@6` makes pnpm
-create a second `vite-plus` copy, and `vp run -r test` then fails with
-`Cannot read properties of undefined (reading 'config')`.
-
-## Traps
-
-| Symptom                                                                         | Cause                                                                                                  | Fix                                                                                          |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| `TS4111: Property 'X' comes from an index signature`                            | `noPropertyAccessFromIndexSignature`                                                                   | `process.env["X"]`, not `process.env.X`                                                      |
-| `no-unsafe-*` on `res.json()` / `JSON.parse`                                    | the platform returns `any`                                                                             | annotate `const data: unknown = …`, narrow with `typeof` / `in` guards, never cast           |
-| `prefer-readonly-parameter-types` on a DOM element or event                     | DOM types are mutable                                                                                  | listed in the rule's `allow` (root `vite.config.ts`); add the type there if it is a DOM type |
-| `no-array-callback-reference` on `.filter(fn)`                                  | the callback would receive index and array                                                             | `.filter((item) => fn(item))`                                                                |
-| `\b` misses accented words in a regex                                           | `\b` is ASCII-only                                                                                     | `(?![\p{L}\p{N}_])` with the `u` flag                                                        |
-| `vp build` at the root: `needs a target package`                                | root is a workspace                                                                                    | `vp -C apps/<app> build`                                                                     |
-| `node: command not found`                                                       | Vite+ owns Node                                                                                        | `vpx <file>` or `vp node <file>`                                                             |
-| `error: Command 'node' not found` in a git hook                                 | the hook dispatcher puts the project-local `vp` first on PATH; `vp node` exists only in the global CLI | `vpx <file>`                                                                                 |
-| `vp install` asks to reinstall modules, pnpm prints an old version              | Vite+ in `system-first` mode runs the pnpm on PATH                                                     | `vp env on pnpm`; `vp env doctor` must show `Source devEngines.packageManager`               |
-| `Could not find a valid TypeScript installation` from the LSP                   | no TS 6 next to the language server                                                                    | the one-time setup above                                                                     |
-| `EBUSY` / `Device or resource busy` spawning `tsgolint` or `tsc` under `vp run` | script caching tracks files and cannot spawn static binaries                                           | keep `run.cache.scripts: false` (root `vite.config.ts`)                                      |
-| A `console.log` in a test prints nothing                                        | the reporter hides test stdout                                                                         | log to a git-ignored file, read it after the run, remove the calls                           |
-
-## Dev server under WSL
-
-Use `server: { host: true, port, strictPort: true }` in an app's `vite.config.ts` so the editor
-can forward the port and a busy port fails loudly. Stop a server by PID (`ss -ltnp | grep <port>`),
-never `pkill -f <pattern>` (it matches the calling shell). `Port <n> is already in use` while
-`ss -ltn` shows nothing: a Windows process holds it (`netstat.exe -ano -p tcp | grep ':<port> '`,
-then `tasklist.exe /FI "PID eq <pid>"`); editors that auto-forward WSL ports keep them bound.
+- [references/traps.md](references/traps.md): lint and type errors that recur, task and pack
+  failures, a dev server port that stays busy. Read it when a `vp check`, `vp run` or port
+  error is not obvious.
+- [references/editor.md](references/editor.md): VS Code and Cursor settings, the Oxc
+  extension, the TypeScript language server on TypeScript 7.

@@ -8,8 +8,10 @@ export default defineConfig({
     // In order: tools/guard rejects secrets and personal data, then format and lint fixes apply.
     "*": ["vpx tools/guard/src/bin/scan-staged.ts", "vp check --fix"],
   },
-  fmt: {},
+  // .claude/skills/vp: managed by qol-mini (.claude/qol-mini.lock.json), never rewritten here.
+  fmt: { ignorePatterns: [".claude/skills/vp/**"] },
   lint: {
+    ignorePatterns: [".claude/skills/vp/**"],
     plugins: ["eslint", "typescript", "unicorn", "oxc", "import", "promise", "node", "vitest"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     categories: {
