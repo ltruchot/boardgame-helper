@@ -38,13 +38,20 @@ export default defineConfig({
       "typescript/use-unknown-in-catch-callback-variable": "error",
       "typescript/no-namespace": "error",
       "typescript/no-import-type-side-effects": "error",
-      // Inferred callback parameters (RegExpExecArray, ...), DOM nodes and events cannot be made deeply
-      // readonly; every other parameter must be.
+      // Inferred callback parameters (RegExpExecArray, ...), DOM nodes and events, and the Anthropic
+      // SDK's client and response objects cannot be made deeply readonly; every other parameter must be.
       "typescript/prefer-readonly-parameter-types": [
         "error",
         {
           ignoreInferredTypes: true,
-          allow: [{ from: "lib", name: ["Element", "HTMLElement", "HTMLButtonElement", "Event"] }],
+          allow: [
+            { from: "lib", name: ["Element", "HTMLElement", "HTMLButtonElement", "Event"] },
+            {
+              from: "package",
+              package: "@anthropic-ai/sdk",
+              name: ["Anthropic", "ModelInfo", "Message"],
+            },
+          ],
         },
       ],
 

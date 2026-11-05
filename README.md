@@ -5,7 +5,7 @@ Experiments with the Claude API for board game assistance, in a Vite+ TypeScript
 | Path             | Content                                                          |
 | ---------------- | ---------------------------------------------------------------- |
 | `apps/website`   | Vite web app                                                     |
-| `apps/api`       | Vite app using `@anthropic-ai/sdk`                               |
+| `apps/api`       | Node HTTP server using `@anthropic-ai/sdk`                       |
 | `packages/utils` | shared helpers                                                   |
 | `tools/guard`    | checks that keep secrets and personal data out of the repository |
 
@@ -30,6 +30,7 @@ them to browser code (Vite inlines `VITE_*` variables into the bundle).
 
 ```bash
 vp run dev          # website dev server
+vp run api          # API server on port 3000 (PORT to change), restarts on change
 vp check            # format, lint, type check
 vp run -r test      # tests
 vp run ready        # everything above plus the builds

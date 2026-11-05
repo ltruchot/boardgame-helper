@@ -4,17 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev",
-    "build": "tsc && vp build",
-    "preview": "vp preview"
+    "dev": "vpx --env-file-if-exists=.env --watch src/main.ts",
+    "start": "vpx --env-file-if-exists=.env src/main.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "catalog:",
     "utils": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:"
   }
 }

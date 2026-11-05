@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["es2023", "dom", "dom.iterable"],
-    "types": ["vite/client"],
-    "allowArbitraryExtensions": true
+    "lib": ["es2023"],
+    "types": ["node"]
   },
   "include": ["src", "*.ts"]
 }
