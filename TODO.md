@@ -2,10 +2,12 @@
 
 ## Where we stopped
 
-Nothing in progress on the tooling: `main` is pushed (`dacc002`), `vp run ready` passes.
+Nothing in progress on the tooling: `main` is pushed (`216232e`). Rules live in `AGENTS.md`
+only (no `CLAUDE.md`); `vp config` rewrites only its Vite+ block between the markers.
 
-- `apps/api/src/main.ts` has an uncommitted local edit (the calls to exercises 1 and 2 are
-  commented out): work in progress on the exercises, not part of any commit yet.
+- `apps/api/src/main.ts`: the exercise calls (and their imports, `printResponse` included) are
+  commented out, so a run only lists the models and checks Haiku 4.5 is there. Uncomment an
+  exercise and its imports together: an import left without its call fails `vp check`.
 - Format on save in Cursor works through the oxc-vscode#418 workaround (machine settings, not
   in the repo): `"oxc.path.oxfmt": "${userHome}/.vite-plus/bin/oxfmt"` in
   `~/.cursor-server/data/Machine/settings.json`, with `oxfmt@0.76.0` installed by
