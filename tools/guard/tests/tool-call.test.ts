@@ -16,6 +16,9 @@ describe("Bash commands", () => {
     "printenv",
     "env",
     "env | grep KEY",
+    "env -0",
+    "env -u HOME",
+    "env -i FOO=1",
     "export -p",
     "cat /proc/self/environ",
     "echo $ANTHROPIC_API_KEY",
@@ -36,6 +39,8 @@ describe("Bash commands", () => {
   it.each([
     "vp check",
     "env NODE_ENV=test vp test",
+    "env -i PATH=/usr/bin:/bin sh -c 'vp check'",
+    "env -u HOME vp test",
     "git grep -n process.env",
     "rg --hidden token",
     "git commit -m 'chore: ignore .env files'",

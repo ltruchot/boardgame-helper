@@ -57,8 +57,24 @@ function segments(command: string): readonly string[] {
     .filter((segment) => segment !== "");
 }
 
+// `env` prints the environment only when no command follows its options and assignments:
+// `env -i PATH=/bin cmd` runs `cmd`, `env -0` prints.
+function isBareEnv(segment: string): boolean {
+  const words = segment.split(/\s+/u);
+  if (words[0] !== "env") {
+    return false;
+  }
+  const command = words
+    .slice(1)
+    .filter(
+      (word, index, all) =>
+        !word.startsWith("-") && !/^[A-Za-z_]\w*=/u.test(word) && all[index - 1] !== "-u",
+    );
+  return command.length === 0;
+}
+
 function isEnvDump(segment: string): boolean {
-  if (/^(?:env|set|export)\s*$/u.test(segment) || /^env\s+-/u.test(segment)) {
+  if (/^(?:set|export)\s*$/u.test(segment) || isBareEnv(segment)) {
     return true;
   }
   return ENV_DUMP_COMMANDS.some((dump) => segment === dump || segment.startsWith(`${dump} `));
