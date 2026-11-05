@@ -1,0 +1,1 @@
+vpx tools/guard/src/bin/commit-msg.ts "$1"

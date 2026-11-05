@@ -1,0 +1,15 @@
+{
+  "name": "guard",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Blocks secrets, personal data and conversation narration from commits, PRs and agent tool calls.",
+  "type": "module",
+  "scripts": {
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

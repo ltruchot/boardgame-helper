@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": "🤖 Generated with [Claude Code](https://claude.com/claude-code)",
+    "sessionUrl": false
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(vp check)",
+      "Bash(vp check --fix)",
+      "Bash(vp lint *)",
+      "Bash(vp test)",
+      "Bash(vp test *)",
+      "Bash(vp run ready)",
+      "Bash(vp run -r test)",
+      "Bash(vp run -r build)",
+      "Bash(vp -C * test)",
+      "Bash(vp -C * test *)",
+      "Bash(vp -C * build)",
+      "Bash(vp install)",
+      "Bash(vpx tools/guard/src/bin/check-text.ts)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git grep *)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/.envrc)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.git-credentials)",
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(* --no-verify*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(vp hooks disable*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read|Edit|Write|MultiEdit|NotebookEdit|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "vpx \"$CLAUDE_PROJECT_DIR\"/tools/guard/src/bin/claude-hook.ts",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
