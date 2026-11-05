@@ -1,5 +1,8 @@
 # boardgame-helper
 
+> Session handoff: read `TODO.md` first — where the last session stopped, and what is left.
+> Open a `todo/` file only for the item you work on. An item done → delete its line and its `todo/` file.
+
 Public monorepo for Claude API experiments. Everything committed, pushed or posted (code, commits,
 PRs, issues, comments, logs, docs) is public. Everything is written in English.
 
@@ -22,6 +25,10 @@ PRs, issues, comments, logs, docs) is public. Everything is written in English.
 - Enforced by `tools/guard`: the Claude Code `PreToolUse` hook (`.claude/settings.json`), the git
   `pre-commit` and `commit-msg` hooks (`.vite-hooks/`). A block is fixed in the content, never
   worked around: no `--no-verify`, no `VP_GIT_HOOKS=0`, no `vp hooks disable`.
+- The hook reads the whole text of a Bash command, heredocs included: a command whose text
+  mentions `.env` or a hook bypass (`--no-verify`, `VP_GIT_HOOKS=0`) is blocked even when it only
+  writes that word into a file. Write such files with Write/Edit: their content is checked for
+  secrets and personal data only.
 
 ## 2. Writing: commits, PRs, comments, logs, docs
 
