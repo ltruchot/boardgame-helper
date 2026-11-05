@@ -1,9 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Models } from "@anthropic-ai/sdk/resources";
-import { helloClaude } from "./ex01-hello-claude";
+/*
 import { printResponse } from "./utils";
+import { helloClaude } from "./ex01-hello-claude";
 import { badGameRule } from "./ex02-bad-game-rule";
-
+*/
 const client = new Anthropic();
 
 const models = await client.models.list();
@@ -18,9 +19,13 @@ if (!cheapHaikuModel) {
 }
 
 // Exercise 1: Hello, Claude
+/*
 const response = await helloClaude(client, cheapHaikuModel);
 printResponse("Hello, Claude", response);
+*/
 
 // Exercise 2: Bad Game Rule
+/*
 const response2 = await badGameRule(client, cheapHaikuModel);
 printResponse("Bad Game Rule", response2);
+*/
