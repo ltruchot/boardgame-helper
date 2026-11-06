@@ -64,6 +64,33 @@
     "version": 1
   },
   "skills": {
+    "css-modern": {
+      "answers": {
+        "TOKENS_FILE": "apps/website/src/tokens.css",
+        "TOKEN_PREFIX": "--bgh"
+      },
+      "files": {
+        "SKILL.md": "d43a9e2f813e611e1271b2a70079dacf72154c3e45d76beba7ad0a390f472905",
+        "references/accessibility.md": "51e19fb8ee8fb513e166a463237e43efda48d94be70423c626152b69d7836720",
+        "references/animations.md": "ca20a87af57cf9103d45c803a62c03d8157b07c7620cb1e02f0887fb0584b54b",
+        "references/color.md": "d847ffef51f074455a888d115b9904ee3b8c9a3495404527091e630b6d5de98c",
+        "references/design-tokens.md": "34399eb5b005ba44cde059993d73288deea0c053fcdd4b87dbe6a19dcddbadc7",
+        "references/layout.md": "cdf04b79af9980c870392a17d1e920b738f688de1d6f466d3a0f752d6d6bbd5e",
+        "references/reset.md": "50de34987819c2f31cff050ab19b1f4d2178697c1c1a07bab8b325a796addf70",
+        "references/selectors.md": "feaf67ab5dfe13a3f1f3239f1471c3b6ab6c236ac81774a9f67f96756a013afc",
+        "references/typography.md": "7d6645730bcfa845e787b5f0b8940b7e016b0466e64c342a2cfca0acb5a02d61",
+        "references/utilities.md": "4e8e233a629cc9d24863ff8fc6ebdfc51f257f09c69aea0b38c693c2ab55c071"
+      },
+      "path": ".claude/skills/css-modern",
+      "ref": "0.6.3",
+      "renderedHash": "845684af18a29dd2c0fea434ab528cc7bfb57c20774d80aa49293d0e126af2e9",
+      "secrets": [],
+      "sha": "local:14c55c3d8072c12494b2139f1f67e99cf2c34bd12c2a4f5567e6f10b2e6544df",
+      "skillPath": "skills/css-modern",
+      "source": "qol-mini",
+      "sourceType": "local",
+      "templateHash": "2d851968c79dc3250a1481039c976a4487d80305e03e4a5c1526417e4bd845c4"
+    },
     "vp": {
       "answers": {
         "APP_DIR": "apps/website",
