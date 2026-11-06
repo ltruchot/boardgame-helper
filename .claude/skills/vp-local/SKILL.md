@@ -1,12 +1,6 @@
 ---
 name: vp-local
 description: This repo's Vite+ setup, on top of the shared `vp` skill - the workspace and its packages, the Node app in apps/api, the strict tsconfig and lint, the git hooks and tools/guard, the TypeScript LSP plugin, and the traps met here. Load with `vp` before touching package.json, vite.config.ts, tsconfig*.json, pnpm-workspace.yaml, .vite-hooks/, or running install/build/dev/test.
-paths:
-  - "**/package.json"
-  - "**/vite.config.ts"
-  - "**/tsconfig*.json"
-  - "pnpm-workspace.yaml"
-  - ".vite-hooks/*"
 ---
 
 # Vite+ in this repo
