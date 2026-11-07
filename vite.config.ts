@@ -49,7 +49,7 @@ export default defineConfig({
             {
               from: "package",
               package: "@anthropic-ai/sdk",
-              name: ["Anthropic", "ModelInfo", "Message"],
+              name: ["Anthropic", "ModelInfo", "Message", "BetaMessage"],
             },
           ],
         },

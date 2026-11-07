@@ -23,6 +23,11 @@ dist-ssr
 id_rsa*
 id_ed25519*
 
+# Publisher rulebooks: copyrighted, downloaded locally (see README)
+apps/api/assets/*.pdf
+# Source files of the assets, with author metadata
+raw/
+
 # Claude Code local-only files
 .claude/settings.local.json
 .claude/worktrees/

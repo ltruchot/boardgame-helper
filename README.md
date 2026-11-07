@@ -26,6 +26,20 @@ them to browser code (Vite inlines `VITE_*` variables into the bundle).
 | ------------------- | ---------- | -------------- |
 | `ANTHROPIC_API_KEY` | `apps/api` | Claude API key |
 
+## Rulebooks
+
+The exercises send Brass: Lancashire rulebooks to the API as documents. The PDF rulebooks are
+copyrighted, so they are git-ignored: download them from the
+[Brass: Lancashire files on BoardGameGeek](https://boardgamegeek.com/boardgame/28720/brass-lancashire/files)
+into `apps/api/assets/` under the names below.
+
+| File in `apps/api/assets/`            | Content                                                |
+| ------------------------------------- | ------------------------------------------------------ |
+| `brass-player-aid-2-sided.pdf`        | two-page player aid                                    |
+| `brass-lancashire-precise-aid.md`     | text summary: tile costs, actions, scoring (committed) |
+| `brass-restructured-rules-v2.pdf`     | condensed rules, no examples                           |
+| `brass-lancashire-official-rules.pdf` | publisher rulebook                                     |
+
 ## Development
 
 ```bash
