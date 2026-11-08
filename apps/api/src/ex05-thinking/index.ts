@@ -108,12 +108,17 @@ const persona = `You are a rules judge at a board game convention.
 <method>
 1. Fetch at least one rulebook before answering, in the order given by the tool.
 2. State only facts that a fetched rulebook supports. Quote the official rulebook as proof. Use the other rulebooks to find rules, not as proof: quote one of them only for a point the official rulebook does not cover, and say so. If they disagree with the official rulebook, the official rulebook wins.
-3. If the fetched rulebooks do not cover a point, such as a price or a map location, fetch the next rulebook. If none covers it, write "Not covered by the rulebooks" for that point. Never fill the gap from memory.
+3. If the fetched rulebooks do not cover a point, such as a price or a map location, fetch the next rulebook. If none covers it, and no deduction from quoted rules settles it, write "Not covered by the rulebooks" for that point. Never fill the gap from memory.
 4. Answer the question asked, and add no facts beyond it.
 5. Before ruling on a situation, work out the exact game state at that moment: tiles and links on the board, including tiles that players earlier in the same round may have built, and which players have already played this round. Check each requirement against that state.
 6. You may draw conclusions that follow logically from quoted rules. Label each one as a deduction and name the rules it comes from.
 7. When asked whether something is possible, list every way each requirement can be met, and check each one against the game state, including what earlier players may have built.
-</method>`;
+</method>
+
+<format>
+- Start with the ruling in one or two sentences: who can, who cannot, and under which conditions.
+- When you name a rule, use its section title or quote it, never a document index.
+</format>`;
 const prompt =
   "In Brass: Lancashire, can a player build an Iron Works on their very first turn? If so, in what situation?";
 
@@ -134,7 +139,10 @@ const getRulebookTool = betaZodTool({
   run: ({ name }) => [getRulebook(name)],
 });
 
-export async function askJudge(client: Anthropic, model: Models.ModelInfo): Promise<BetaMessage> {
+export async function askThinkingJudge(
+  client: Anthropic,
+  model: Models.ModelInfo,
+): Promise<BetaMessage> {
   const runner = client.beta.messages.toolRunner({
     system: persona,
     model: model.id,
@@ -162,57 +170,3 @@ export async function askJudge(client: Anthropic, model: Models.ModelInfo): Prom
 
   return runner.done();
 }
-
-/*
-async function runTool(name: string, toolInput: any) {
-  if (name === "get_weather") {
-    if (toolInput?.city === undefined || typeof toolInput.city !== "string") {
-      throw new Error("City is a required string in input record");
-    }
-    return `15°C in ${toolInput["city"]} right now`;
-  }
-  throw new Error(`Tool ${name} not found`);
-}
-
-export function loopUntilWeather(
-  client: Anthropic,
-  model: Models.ModelInfo,
-): Promise<Message> {
-  const messages: Anthropic.Messages.MessageParam[] = [
-    { role: "user", content: "What should I wear in Paris today?" },
-  ];
-  while (true) {
-    const response = await client.messages.create({
-      tools,
-      model: model.id,
-      max_tokens: 1024,
-      messages,
-    });
-
-    if (response.stop_reason === "end_turn") {
-      process.stdout.write(`End turn: ${response.content.map((r) => r.text)}\n`);
-      for (const block of response.content) {
-        if (block.type === "text") {
-          return response;
-        }
-      }
-      throw new Error("No text block found in response");
-    }
-
-    if (response.stop_reason === "tool_use") {
-      process.stdout.write(
-        `Tool use: ${response.content.map((r) => r.text || r.name).join("\n -> ")}\n`,
-      );
-      const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
-      for (const block of response.content) {
-        if (block.type === "tool_use") {
-          const result = await runTool(block.name, block.input);
-          toolResults.push({ tool_use_id: block.id, content: result, type: "tool_result" });
-        }
-      }
-      messages.push({ role: "assistant", content: response.content });
-      messages.push({ role: "user", content: toolResults });
-    }
-  }
-}
-*/

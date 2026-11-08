@@ -146,16 +146,11 @@ export async function askJudge(client: Anthropic, model: Models.ModelInfo): Prom
     // Thinking tokens count against max_tokens: at 1024, thinking can use them all and leave no answer.
     max_tokens: 16000,
     messages: [{ role: "user", content: prompt }],
-    thinking: { type: "adaptive", display: "summarized" },
-    output_config: { effort: "high" },
     tools: [getRulebookTool],
   });
 
   for await (const message of runner) {
     for (const block of message.content) {
-      if (block.type === "thinking" && block.thinking !== "") {
-        process.stdout.write(`  thinking: ${block.thinking}\n`);
-      }
       if (block.type === "tool_use") {
         process.stdout.write(`→ ${block.name} ${JSON.stringify(block.input)}\n`);
       }

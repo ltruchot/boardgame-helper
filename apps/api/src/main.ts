@@ -44,6 +44,12 @@ printResponse("Bad Game Rule", response2);
 const response3 = await chooseModel(client, oldModels);
 response3.forEach((response) => printResponse(`Choose Model`, response));
 */
-
-const response4 = await askJudge(client, opus);
+// Exercise 4: Tool
+/*
+const response4 = await askJudge(client, sonnet);
 printResponse("Ask the Judge", response4);
+*/
+
+// Exercise 5: Thinking
+const response5 = await askJudge(client, opus);
+printResponse("Ask the Judge", response5);
